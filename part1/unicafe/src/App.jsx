@@ -37,13 +37,24 @@ const App = () => {
         <Button onClick={() => increment('bad')}>bad</Button>
       </div>
       <Heading content='statistics' level={2} />
-      <Statistic name='good' count={good} />
-      <Statistic name='neutral' count={neutral} />
-      <Statistic name='bad' count={bad} />
 
-      <Statistic name='all' count={good + neutral + bad} />
-      <Statistic name='average' count={average} />
-      <Statistic name='positive' count={positivePercentage} needsPercentage />
+      {total > 0 ? (
+        <>
+          <Statistic name='good' count={good} />
+          <Statistic name='neutral' count={neutral} />
+          <Statistic name='bad' count={bad} />
+
+          <Statistic name='all' count={good + neutral + bad} />
+          <Statistic name='average' count={average} />
+          <Statistic
+            name='positive'
+            count={positivePercentage}
+            needsPercentage
+          />
+        </>
+      ) : (
+        <p>No feedback given</p>
+      )}
     </div>
   )
 }
