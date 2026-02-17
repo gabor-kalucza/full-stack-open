@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Heading from './components/Heading'
 import Button from './components/Button'
-import Statistic from './components/Statistic'
+import Statistics from './components/Statistics'
 
 const App = () => {
   const [good, setGood] = useState(0)
@@ -37,24 +37,14 @@ const App = () => {
         <Button onClick={() => increment('bad')}>bad</Button>
       </div>
       <Heading content='statistics' level={2} />
-
-      {total > 0 ? (
-        <>
-          <Statistic name='good' count={good} />
-          <Statistic name='neutral' count={neutral} />
-          <Statistic name='bad' count={bad} />
-
-          <Statistic name='all' count={good + neutral + bad} />
-          <Statistic name='average' count={average} />
-          <Statistic
-            name='positive'
-            count={positivePercentage}
-            needsPercentage
-          />
-        </>
-      ) : (
-        <p>No feedback given</p>
-      )}
+      <Statistics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        average={average}
+        positivePercentage={positivePercentage}
+        total={total}
+      />
     </div>
   )
 }
