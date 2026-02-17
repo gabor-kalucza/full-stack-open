@@ -1,4 +1,4 @@
-const Total = ({ parts }) => {
+const Total = ({ course: { parts } }) => {
   return (
     <p>
       Number of exercises{' '}
