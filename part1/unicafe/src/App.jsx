@@ -8,6 +8,10 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+  const total = good + neutral + bad
+  const average = total === 0 ? 0 : (good - bad) / total
+  const positivePercentage = total === 0 ? 0 : (good / total) * 100
+
   const increment = (type) => {
     switch (type) {
       case 'good':
@@ -36,6 +40,10 @@ const App = () => {
       <Statistic name='good' count={good} />
       <Statistic name='neutral' count={neutral} />
       <Statistic name='bad' count={bad} />
+
+      <Statistic name='all' count={good + neutral + bad} />
+      <Statistic name='average' count={average} />
+      <Statistic name='positive' count={positivePercentage} needsPercentage />
     </div>
   )
 }

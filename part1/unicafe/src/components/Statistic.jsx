@@ -1,7 +1,7 @@
-const Statistic = ({ name, count }) => {
+const Statistic = ({ name, count, needsPercentage = false }) => {
   return (
     <p>
-      {name} {count}
+      {name} {count} {needsPercentage ? '%' : ''}
     </p>
   )
 }
