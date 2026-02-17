@@ -5,21 +5,22 @@ sequenceDiagram
     participant browser
     participant server
 
-    user->>browser: Visit /spa
+    user->>browser: Visit https://studies.cs.helsinki.fi/exampleapp/spa
 
-    browser->>server: GET /spa
+    browser->>server: GET /exampleapp/spa
     server-->>browser: HTML document
 
-    browser->>server: GET main.css
+    browser->>server: GET /exampleapp/main.css
     server-->>browser: CSS file
 
-    browser->>server: GET spa.js
+    browser->>server: GET /exampleapp/spa.js
     server-->>browser: JavaScript file
 
-    browser->>browser: Execute JavaScript
+    browser->>browser: Execute spa.js
 
-    browser->>server: GET /data.json
+    browser->>server: GET /exampleapp/data.json
     server-->>browser: JSON notes data
 
-    note right of browser: JavaScript renders notes into the page
+    note right of browser: JavaScript renders notes dynamically
+
 ```
