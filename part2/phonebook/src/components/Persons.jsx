@@ -1,9 +1,9 @@
-const Persons = ({ persons, filterValue }) => {
+const Persons = ({ persons, searchTerm }) => {
   return (
     <>
       {persons
         .filter((p) =>
-          p.name.toLowerCase().includes(filterValue.toLocaleLowerCase()),
+          p.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()),
         )
         .map((p) => (
           <div key={p.id}>
