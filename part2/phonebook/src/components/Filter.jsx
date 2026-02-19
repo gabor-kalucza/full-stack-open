@@ -1,4 +1,4 @@
-const Filter = ({ filterValue, setFilterValue }) => {
+const Filter = ({ searchTerm, setSearchTerm }) => {
   return (
     <>
       <label htmlFor='filter'>filter shown with:</label>
@@ -6,8 +6,8 @@ const Filter = ({ filterValue, setFilterValue }) => {
         id='filter'
         type='text'
         placeholder='John Doe'
-        value={filterValue}
-        onChange={(e) => setFilterValue(e.target.value)}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
     </>
   )
