@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import axios from 'axios'
+import personService from './services/persons'
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -11,27 +11,16 @@ const App = () => {
   const [formData, setFormData] = useState({
     name: '',
     number: '',
-    id: '',
   })
 
   useEffect(() => {
-    const fetchPersons = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/persons')
-        setPersons(response.data)
-      } catch (error) {
-        console.error('Error fetching persons:', error)
-      }
-    }
-
-    fetchPersons()
+    personService.getAll().then((data) => setPersons(data))
   }, [])
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-      id: persons.length + 1,
     })
   }
 
@@ -46,19 +35,18 @@ const App = () => {
       return
     }
 
-    setPersons([
-      ...persons,
-      {
-        name: formData.name,
-        number: formData.number,
-        id: persons.length + 1,
-      },
-    ])
+    const newPerson = {
+      name: formData.name,
+      number: formData.number,
+    }
+
+    personService
+      .create(newPerson)
+      .then((returnedPerson) => setPersons([...persons, returnedPerson]))
 
     setFormData({
       name: '',
       number: '',
-      id: '',
     })
   }
 
