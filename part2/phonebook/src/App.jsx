@@ -9,6 +9,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [persons, setPersons] = useState([])
   const [notificationMessage, setNotificationMessage] = useState(null)
+  const [isError, setIsError] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -83,11 +84,20 @@ const App = () => {
               p.id === returnedPerson.id ? returnedPerson : p,
             ),
           )
+          setNotificationMessage(
+            `Successfully updated ${existingPerson.name} phone number`,
+          )
+          setIsError(false)
         })
-
-      setNotificationMessage(
-        `Successfully updated ${existingPerson.name} phone number`,
-      )
+        .catch(() => {
+          setPersons((prevPersons) =>
+            prevPersons.filter((p) => p.id !== existingPerson.id),
+          )
+          setNotificationMessage(
+            `Information of ${existingPerson.name} has already been removed from server`,
+          )
+          setIsError(true)
+        })
     } else {
       personService
         .create(newPerson)
@@ -98,6 +108,8 @@ const App = () => {
       setNotificationMessage(
         `Successfully added ${newPerson.name} to phonebook`,
       )
+
+      setIsError(false)
     }
 
     setFormData({
@@ -109,7 +121,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage} isError={isError} />
       <Filter searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <h2>Add a new</h2>
 

@@ -17,8 +17,6 @@ const update = (id, newObject) => {
 }
 
 const updateNumber = (person, newNumber) => {
-  console.log('person from service')
-  console.log(person)
   const updatedPerson = { ...person, number: newNumber }
   const req = axios.put(`${baseUrl}/${person.id}`, updatedPerson)
   return req.then((response) => response.data)
