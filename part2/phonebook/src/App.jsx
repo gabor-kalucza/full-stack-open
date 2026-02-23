@@ -26,15 +26,19 @@ const App = () => {
 
   const handleRemovePerson = (id) => {
     const selectedPerson = persons.find((p) => p.id === id)
-    if (window.confirm(`Delete ${selectedPerson.name} ?`)) {
-      personService
-        .remove(id)
-        .then(() =>
-          setPersons((prevPersons) => prevPersons.filter((p) => p.id !== id)),
-        )
-    } else {
+    const confirmRemovePerson = window.confirm(
+      `Delete ${selectedPerson.name} ?`,
+    )
+
+    if (!confirmRemovePerson) {
       return
     }
+
+    personService
+      .remove(id)
+      .then(() =>
+        setPersons((prevPersons) => prevPersons.filter((p) => p.id !== id)),
+      )
   }
 
   const personExists = (name) =>
@@ -46,27 +50,31 @@ const App = () => {
     e.preventDefault()
     setSearchTerm('')
 
-    const newPerson = { ...formData }
+    const newPerson = {
+      name: formData.name.trim(),
+      number: formData.number.trim(),
+    }
 
-    if (personExists(newPerson.name)) {
-      const p = personExists(newPerson.name)
-      console.log(p)
-      if (
-        window.confirm(
-          `${p.name} is already added to phonebook, replace the old number with the new one?`,
-        )
-      ) {
-        personService
-          .updateNumber(p, formData.number)
-          .then((returnedPerson) => {
-            setPersons((prevPersons) =>
-              prevPersons.map((p) =>
-                p.id === returnedPerson.id ? returnedPerson : p,
-              ),
-            )
-          })
+    const existingPerson = personExists(newPerson.name)
+
+    if (existingPerson) {
+      const confirmUpdate = window.confirm(
+        `${existingPerson.name} is already added to phonebook, replace the old number with the new one?`,
+      )
+
+      if (!confirmUpdate) {
+        return
       }
-      return
+
+      personService
+        .updateNumber(existingPerson, formData.number)
+        .then((returnedPerson) => {
+          setPersons((prevPersons) =>
+            prevPersons.map((p) =>
+              p.id === returnedPerson.id ? returnedPerson : p,
+            ),
+          )
+        })
     } else {
       personService
         .create(newPerson)
