@@ -20,7 +20,7 @@ const App = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value.trim(),
     })
   }
 
@@ -37,25 +37,43 @@ const App = () => {
     }
   }
 
-  const nameExists = (name) =>
-    persons.some((p) => p.name.toLowerCase() === name.toLowerCase())
+  const personExists = (name) =>
+    persons.find(
+      (p) => p.name.toLowerCase().trim() === name.toLowerCase().trim(),
+    )
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setSearchTerm('')
-    if (nameExists(formData.name)) {
-      alert(`${formData.name} is already added to phonebook`)
+
+    const newPerson = { ...formData }
+
+    if (personExists(newPerson.name)) {
+      const p = personExists(newPerson.name)
+      console.log(p)
+      if (
+        window.confirm(
+          `${p.name} is already added to phonebook, replace the old number with the new one?`,
+        )
+      ) {
+        personService
+          .updateNumber(p, formData.number)
+          .then((returnedPerson) => {
+            setPersons((prevPersons) =>
+              prevPersons.map((p) =>
+                p.id === returnedPerson.id ? returnedPerson : p,
+              ),
+            )
+          })
+      }
       return
+    } else {
+      personService
+        .create(newPerson)
+        .then((returnedPerson) =>
+          setPersons((prevPersons) => [...prevPersons, returnedPerson]),
+        )
     }
-
-    const newPerson = {
-      name: formData.name,
-      number: formData.number,
-    }
-
-    personService
-      .create(newPerson)
-      .then((returnedPerson) => setPersons([...persons, returnedPerson]))
 
     setFormData({
       name: '',
