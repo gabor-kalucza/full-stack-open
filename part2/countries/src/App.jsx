@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import Countries from './components/Countries'
+import Country from './components/Country'
 
 const BASE_URL = 'https://studies.cs.helsinki.fi/restcountries/api'
 
@@ -7,6 +9,8 @@ const App = () => {
   const [country, setCountry] = useState('')
   const [countries, setCountries] = useState([])
   const [results, setResults] = useState([])
+
+  console.log(results)
 
   useEffect(() => {
     axios.get(`${BASE_URL}/all`).then((res) => {
@@ -37,19 +41,7 @@ const App = () => {
       {country && results.length === 1 ? (
         <div>
           {results.map((c) => (
-            <article key={c.name.official}>
-              <h1>{c.name.common}</h1>
-              <p>capital {c.capital?.join(', ')}</p>
-              <p>area {c.area}</p>
-              <h2>Languages</h2>
-              <ul>
-                {c.languages &&
-                  Object.values(c.languages).map((lang) => (
-                    <li key={lang}>{lang}</li>
-                  ))}
-              </ul>
-              <img className='img' src={c.flags.svg} alt={c.flags.official} />
-            </article>
+            <Country key={c.name.common} country={c} />
           ))}
         </div>
       ) : (
@@ -57,11 +49,7 @@ const App = () => {
           {results.length > 10 ? (
             <p>too many matches, specify another filter</p>
           ) : (
-            <ul>
-              {results.map((c) => (
-                <li key={c.name.official}>{c.name.common}</li>
-              ))}
-            </ul>
+            <Countries countries={results} setResults={setResults} />
           )}
         </div>
       )}
