@@ -1,3 +1,19 @@
 {
-  "persons": []
+  "persons": [
+    {
+      "id": "b50e",
+      "name": "Tom Perl",
+      "number": "11-22-33-44-55"
+    },
+    {
+      "id": "a3ba",
+      "name": "Coby Asalin",
+      "number": "11-222"
+    },
+    {
+      "id": "a8cb",
+      "name": "Mike Poul",
+      "number": "1234566"
+    }
+  ]
 }

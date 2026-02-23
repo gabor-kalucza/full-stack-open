@@ -30,7 +30,7 @@ const App = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value.trim(),
+      [e.target.name]: e.target.value.trimStart(),
     })
   }
 
