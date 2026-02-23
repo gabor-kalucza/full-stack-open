@@ -24,6 +24,19 @@ const App = () => {
     })
   }
 
+  const handleRemovePerson = (id) => {
+    const selectedPerson = persons.find((p) => p.id === id)
+    if (window.confirm(`Delete ${selectedPerson.name} ?`)) {
+      personService
+        .remove(id)
+        .then(() =>
+          setPersons((prevPersons) => prevPersons.filter((p) => p.id !== id)),
+        )
+    } else {
+      return
+    }
+  }
+
   const nameExists = (name) =>
     persons.some((p) => p.name.toLowerCase() === name.toLowerCase())
 
@@ -62,7 +75,11 @@ const App = () => {
         handleChange={handleChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} searchTerm={searchTerm} />
+      <Persons
+        persons={persons}
+        searchTerm={searchTerm}
+        handleRemovePerson={handleRemovePerson}
+      />
     </div>
   )
 }

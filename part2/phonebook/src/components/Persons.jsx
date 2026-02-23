@@ -1,16 +1,17 @@
-const Persons = ({ persons, searchTerm }) => {
+const Persons = ({ persons, searchTerm, handleRemovePerson }) => {
+  const filteredPersons = persons.filter((p) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
   return (
     <>
       {persons &&
-        persons
-          .filter((p) =>
-            p.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()),
-          )
-          .map((p) => (
-            <div key={p.id}>
-              {p.name} {p.number}
-            </div>
-          ))}
+        filteredPersons.map((p) => (
+          <div key={p.id}>
+            {p.name} {p.number}
+            <button onClick={() => handleRemovePerson(p.id)}>delete</button>
+          </div>
+        ))}
     </>
   )
 }
