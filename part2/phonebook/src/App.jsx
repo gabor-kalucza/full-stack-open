@@ -3,10 +3,12 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [persons, setPersons] = useState([])
+  const [notificationMessage, setNotificationMessage] = useState(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -16,6 +18,13 @@ const App = () => {
   useEffect(() => {
     personService.getAll().then((data) => setPersons(data))
   }, [])
+
+  useEffect(() => {
+    if (notificationMessage) {
+      const timer = setTimeout(() => setNotificationMessage(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [notificationMessage])
 
   const handleChange = (e) => {
     setFormData({
@@ -75,12 +84,20 @@ const App = () => {
             ),
           )
         })
+
+      setNotificationMessage(
+        `Successfully updated ${existingPerson.name} phone number`,
+      )
     } else {
       personService
         .create(newPerson)
         .then((returnedPerson) =>
           setPersons((prevPersons) => [...prevPersons, returnedPerson]),
         )
+
+      setNotificationMessage(
+        `Successfully added ${newPerson.name} to phonebook`,
+      )
     }
 
     setFormData({
@@ -92,6 +109,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} />
       <Filter searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <h2>Add a new</h2>
 
