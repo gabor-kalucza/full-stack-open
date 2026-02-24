@@ -10,8 +10,6 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [results, setResults] = useState([])
 
-  console.log(results)
-
   useEffect(() => {
     axios.get(`${BASE_URL}/all`).then((res) => {
       setCountries(res.data)
