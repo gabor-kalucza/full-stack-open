@@ -51,6 +51,26 @@ app.get('/api/persons/:id', (req, res) => {
   }
 })
 
+app.post('/api/persons', (req, res) => {
+  const id = Math.random().toString(36).substring(2, 6)
+  const { number, name } = req.bod || {}
+
+  if (!number || !name) {
+    return res.status(400).json({
+      error: 'name or number field is missing',
+    })
+  }
+
+  const person = {
+    id,
+    name,
+    number,
+  }
+
+  persons = persons.concat(person)
+  res.json(person)
+})
+
 app.delete('/api/persons/:id', (req, res) => {
   const id = req.params.id
   persons = persons.filter((person) => person.id !== id)
