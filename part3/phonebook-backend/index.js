@@ -53,12 +53,18 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
   const id = Math.random().toString(36).substring(2, 6)
-  const { number, name } = req.bod || {}
+  const { number, name } = req.body || {}
+  const names = persons.map((p) => p.name.toLowerCase())
+  const isNameExists = names.some((n) => n === name.toLowerCase())
 
   if (!number || !name) {
     return res.status(400).json({
       error: 'name or number field is missing',
     })
+  }
+
+  if (isNameExists) {
+    return res.status(400).json({ error: 'name must be unique' })
   }
 
   const person = {
@@ -68,7 +74,7 @@ app.post('/api/persons', (req, res) => {
   }
 
   persons = persons.concat(person)
-  res.json(person)
+  res.status(201).json(person)
 })
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -78,5 +84,5 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  console.log(`server running on port ${PORT}`)
 })
