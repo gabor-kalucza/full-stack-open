@@ -1,9 +1,11 @@
 const express = require('express')
+const postLogger = require('./middlewares/postLogger')
+const morgan = require('morgan')
 
 const PORT = 8080
 const app = express()
 
-app.use(express.json())
+app.use(express.json(), morgan('tiny'))
 
 let persons = [
   {
@@ -51,11 +53,11 @@ app.get('/api/persons/:id', (req, res) => {
   }
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', postLogger, (req, res) => {
   const id = Math.random().toString(36).substring(2, 6)
   const { number, name } = req.body || {}
   const names = persons.map((p) => p.name.toLowerCase())
-  const isNameExists = names.some((n) => n === name.toLowerCase())
+  const isNameExists = names.some((n) => n === name?.toLowerCase())
 
   if (!number || !name) {
     return res.status(400).json({
