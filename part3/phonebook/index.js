@@ -1,11 +1,13 @@
 const express = require('express')
 const postLogger = require('./middlewares/postLogger')
 const morgan = require('morgan')
+const cors = require('cors')
+require('dotenv').config()
 
-const PORT = 8080
+const PORT = process.env.PORT || 3001
 const app = express()
 
-app.use(express.json(), morgan('tiny'))
+app.use(express.static('dist'), express.json(), morgan('tiny'), cors())
 
 let persons = [
   {
