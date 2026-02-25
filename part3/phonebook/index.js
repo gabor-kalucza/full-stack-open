@@ -68,6 +68,27 @@ app.post('/api/persons', postLogger, (req, res) => {
   })
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+  const { number } = req.body
+
+  if (!number) {
+    return res.status(400).json({ error: 'number is required' })
+  }
+
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { number },
+    { new: true, runValidators: true },
+  )
+    .then((updatedPerson) => {
+      if (!updatedPerson) {
+        return res.status(404).json({ error: 'person not found' })
+      }
+      res.json(updatedPerson)
+    })
+    .catch((error) => next(error))
+})
+
 app.delete('/api/persons/:id', (req, res, next) => {
   Person.findByIdAndDelete(req.params.id)
     .then(() => {
