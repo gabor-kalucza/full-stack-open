@@ -1,5 +1,6 @@
 const express = require('express')
 const postLogger = require('./middlewares/postLogger')
+const errorHandler = require('./middlewares/errorHandler')
 const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
@@ -14,7 +15,7 @@ let persons = Person.find({}).then((result) => {
   persons = result
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (_, res) => {
   const requestSentAt = new Date()
 
   res.send(
@@ -28,15 +29,18 @@ app.get('/api/persons', (req, res) => {
   })
 })
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = req.params.id
-  const person = persons.find((person) => person.id === id)
-
-  if (person) {
-    return res.json(person)
-  } else {
-    res.status(404).end()
-  }
+app.get('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (person) {
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch((error) => {
+      next(error)
+    })
 })
 
 app.post('/api/persons', postLogger, (req, res) => {
@@ -59,8 +63,8 @@ app.post('/api/persons', postLogger, (req, res) => {
     number,
   }
 
-  Person.insertOne(person).then(() => {
-    res.status(201).json(person)
+  Person.create(person).then((savedPerson) => {
+    res.status(201).json(savedPerson)
   })
 })
 
@@ -75,3 +79,5 @@ app.delete('/api/persons/:id', (req, res, next) => {
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`)
 })
+
+app.use(errorHandler)
