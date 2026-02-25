@@ -2,6 +2,7 @@ const express = require('express')
 const postLogger = require('./middlewares/postLogger')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3001
@@ -41,7 +42,9 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then((persons) => {
+    res.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (req, res) => {
