@@ -43,7 +43,7 @@ app.get('/api/persons/:id', (req, res, next) => {
     })
 })
 
-app.post('/api/persons', postLogger, (req, res) => {
+app.post('/api/persons', postLogger, (req, res, next) => {
   const { number, name } = req.body || {}
   const names = persons.map((p) => p.name.toLowerCase())
   const isNameExists = names.some((n) => n === name?.toLowerCase())
@@ -58,14 +58,17 @@ app.post('/api/persons', postLogger, (req, res) => {
     return res.status(400).json({ error: 'name must be unique' })
   }
 
-  const person = {
+  const person = new Person({
     name,
     number,
-  }
-
-  Person.create(person).then((savedPerson) => {
-    res.status(201).json(savedPerson)
   })
+
+  person
+    .save()
+    .then((savedPerson) => {
+      res.status(201).json(savedPerson)
+    })
+    .catch((error) => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
