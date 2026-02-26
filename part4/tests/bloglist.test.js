@@ -44,3 +44,10 @@ describe('most blogs', () => {
     assert.deepEqual(result, { author: 'Robert C. Martin', blogs: 3 })
   })
 })
+
+describe('most likes', () => {
+  test('returns the author who has the largest amount of likes', () => {
+    const result = listHelper.mostLikes(blogs)
+    assert.deepEqual(result, { author: 'Edsger W. Dijkstra', likes: 12 })
+  })
+})
