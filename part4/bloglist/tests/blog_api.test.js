@@ -116,6 +116,22 @@ describe('test blog api', () => {
     assert(!ids.includes(id))
   })
 
+  test('PUT request successfully updates a blog post likes', async (t) => {
+    const { _id: id } = initialBlogs[0]
+    const newLikes = 10
+
+    const response = await api
+      .put(`${BASE_URL}/${id}`)
+      .send({ likes: newLikes })
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, newLikes)
+
+    const updatedBlogInDB = await Blog.findById(id)
+    assert.strictEqual(updatedBlogInDB.likes, newLikes)
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
