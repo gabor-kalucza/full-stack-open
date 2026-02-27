@@ -75,6 +75,23 @@ describe('test blog api', () => {
     assert(titles.includes(newPost.title))
   })
 
+  test('if like property is missing from the request, it will default to the value 0', async () => {
+    const newPost = {
+      title: 'TDD harms architecture',
+      author: 'Robert C. Martin',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
+    }
+
+    await api
+      .post(BASE_URL)
+      .send(newPost)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get(BASE_URL)
+    assert.strictEqual(response.body[response.body.length - 1].likes, 0)
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
