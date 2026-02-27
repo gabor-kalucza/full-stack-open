@@ -92,6 +92,19 @@ describe('test blog api', () => {
     assert.strictEqual(response.body[response.body.length - 1].likes, 0)
   })
 
+  test('if the title or url is missing, the backend responds with a 400 bad request status code', async () => {
+    const newPost = {
+      title: 'TDD harms architecture',
+      author: 'Robert C. Martin',
+    }
+
+    await api
+      .post(BASE_URL)
+      .send(newPost)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
