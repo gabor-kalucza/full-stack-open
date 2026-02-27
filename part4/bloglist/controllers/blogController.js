@@ -24,4 +24,13 @@ router.post('/', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
+router.delete('/:id', async (request, response) => {
+  const deletedBlog = await Blog.findByIdAndDelete(request.params.id)
+
+  if (!deletedBlog) {
+    response.status(404).json({ error: 'Blog not found' })
+  }
+  response.status(204).end()
+})
+
 module.exports = router

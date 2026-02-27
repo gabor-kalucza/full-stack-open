@@ -105,6 +105,17 @@ describe('test blog api', () => {
       .expect('Content-Type', /application\/json/)
   })
 
+  test('delete request successfully deletes a blog post', async () => {
+    const id = '5a422a851b54a676234d17f7'
+
+    await api.delete(`${BASE_URL}/${id}`).expect(204)
+
+    const response = await api.get(BASE_URL)
+    const ids = response.body.map((blog) => blog.id)
+    assert.strictEqual(response.body.length, initialBlogs.length - 1)
+    assert(!ids.includes(id))
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
