@@ -53,6 +53,28 @@ describe('test blog api', () => {
     assert.strictEqual(blog._id, undefined)
   })
 
+  test('post request successfully creates a new blog post', async () => {
+    const initialBlogsLength = initialBlogs.length
+    const newPost = {
+      title: 'TDD harms architecture',
+      author: 'Robert C. Martin',
+      url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
+      likes: 0,
+    }
+
+    await api
+      .post(BASE_URL)
+      .send(newPost)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const response = await api.get(BASE_URL)
+    assert.strictEqual(response.body.length, initialBlogsLength + 1)
+
+    const titles = response.body.map((blog) => blog.title)
+    assert(titles.includes(newPost.title))
+  })
+
   after(async () => {
     await mongoose.connection.close()
   })
