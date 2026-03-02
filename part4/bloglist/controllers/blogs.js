@@ -4,7 +4,11 @@ const User = require('../models/user')
 
 router.get('/', async (_, response, next) => {
   try {
-    const blogs = await Blog.find({})
+    const blogs = await Blog.find({}).populate('user', {
+      username: 1,
+      name: 1,
+      id: 1,
+    })
     response.json(blogs)
   } catch (error) {
     next(error)
@@ -13,15 +17,15 @@ router.get('/', async (_, response, next) => {
 
 router.post('/', async (request, response, next) => {
   try {
-    const { likes = 0, author, title, url, userId } = request.body || {}
-    const user = await User.findById(userId)
-
-    if (!user) {
-      return response.status(400).json({ error: 'userId missing or not valid' })
-    }
+    const { likes = 0, author, title, url } = request.body || {}
 
     if (!title || !url) {
       return response.status(400).json({ error: 'title and url are required' })
+    }
+
+    const user = await User.findOne({})
+    if (!user) {
+      return response.status(400).json({ error: 'No users in database' })
     }
 
     const blog = new Blog({
@@ -35,7 +39,14 @@ router.post('/', async (request, response, next) => {
     const savedBlog = await blog.save()
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
-    response.status(201).json(savedBlog)
+
+    const populatedBlog = await savedBlog.populate('user', {
+      username: 1,
+      name: 1,
+      id: 1,
+    })
+
+    response.status(201).json(populatedBlog)
   } catch (error) {
     next(error)
   }
