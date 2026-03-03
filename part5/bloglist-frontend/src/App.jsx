@@ -4,13 +4,14 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [notification, setNotification] = useState(null)
 
   const handleLogout = () => {
     localStorage.removeItem('user')
@@ -27,10 +28,19 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
-    } catch {
-      setErrorMessage('wrong credentials')
+    } catch (error) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.error
+          : 'something went wrong'
+
+      setNotification({
+        text: errorMessage,
+        type: 'error',
+      })
+
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotification(null)
       }, 5000)
     }
   }
@@ -53,6 +63,7 @@ const App = () => {
       {!user && (
         <>
           <h1>login in to application</h1>
+          <Notification message={notification} />
           <LoginForm
             handleLogin={handleLogin}
             username={username}
@@ -71,7 +82,11 @@ const App = () => {
           <br />
           <br />
           <h2>create new</h2>
-          <CreateBlogForm setBlogs={setBlogs} />
+          <Notification message={notification} />
+          <CreateBlogForm
+            setBlogs={setBlogs}
+            setNotification={setNotification}
+          />
           <br />
           <BlogList blogs={blogs} />
         </>
