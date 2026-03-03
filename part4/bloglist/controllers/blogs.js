@@ -1,6 +1,8 @@
 const router = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const getTokenFrom = require('../utils/auth_helper')
 
 router.get('/', async (_, response, next) => {
   try {
@@ -18,14 +20,25 @@ router.get('/', async (_, response, next) => {
 router.post('/', async (request, response, next) => {
   try {
     const { likes = 0, author, title, url } = request.body || {}
+    const token = getTokenFrom(request)
+
+    if (!token) {
+      return response.status(401).json({ error: 'token missing' })
+    }
+
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const user = await User.findById(decodedToken.id)
+
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+
+    if (!user) {
+      return response.status(401).json({ error: 'user not found' })
+    }
 
     if (!title || !url) {
       return response.status(400).json({ error: 'title and url are required' })
-    }
-
-    const user = await User.findOne({})
-    if (!user) {
-      return response.status(400).json({ error: 'No users in database' })
     }
 
     const blog = new Blog({
