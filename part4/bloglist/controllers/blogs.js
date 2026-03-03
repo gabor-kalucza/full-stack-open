@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const { userExtractor } = require('../utils/middleware')
 
 router.get('/', async (_, response, next) => {
   try {
@@ -16,25 +16,10 @@ router.get('/', async (_, response, next) => {
   }
 })
 
-router.post('/', async (request, response, next) => {
+router.post('/', userExtractor, async (request, response, next) => {
   try {
     const { likes = 0, author, title, url } = request.body || {}
-    const token = request.token
-
-    if (!token) {
-      return response.status(401).json({ error: 'token missing' })
-    }
-
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    const user = await User.findById(decodedToken.id)
-
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-
-    if (!user) {
-      return response.status(401).json({ error: 'user not found' })
-    }
+    const user = request.user
 
     if (!title || !url) {
       return response.status(400).json({ error: 'title and url are required' })
@@ -49,6 +34,7 @@ router.post('/', async (request, response, next) => {
     })
 
     const savedBlog = await blog.save()
+
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
 
@@ -83,35 +69,24 @@ router.put('/:id', async (request, response, next) => {
   }
 })
 
-router.delete('/:id', async (request, response, next) => {
+router.delete('/:id', userExtractor, async (request, response, next) => {
   try {
-    const token = request.token
-
-    if (!token) {
-      return response.status(401).json({ error: 'token missing' })
-    }
-
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
+    const user = request.user
 
     const blog = await Blog.findById(request.params.id)
     if (!blog) {
       return response.status(404).json({ error: 'blog not found' })
     }
 
-    if (blog.user.toString() !== decodedToken.id.toString()) {
+    if (blog.user.toString() !== user._id.toString()) {
       return response.status(401).json({ error: 'unauthorized action' })
     }
 
     await Blog.findByIdAndDelete(request.params.id)
 
-    if (blog.user) {
-      await User.findByIdAndUpdate(blog.user, {
-        $pull: { blogs: blog._id },
-      })
-    }
+    await User.findByIdAndUpdate(user._id, {
+      $pull: { blogs: blog._id },
+    })
 
     response.status(204).end()
   } catch (error) {
