@@ -2,7 +2,6 @@ const router = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const getTokenFrom = require('../utils/auth_helper')
 
 router.get('/', async (_, response, next) => {
   try {
@@ -20,7 +19,7 @@ router.get('/', async (_, response, next) => {
 router.post('/', async (request, response, next) => {
   try {
     const { likes = 0, author, title, url } = request.body || {}
-    const token = getTokenFrom(request)
+    const token = request.token
 
     if (!token) {
       return response.status(401).json({ error: 'token missing' })
