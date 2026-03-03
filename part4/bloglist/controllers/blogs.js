@@ -85,14 +85,31 @@ router.put('/:id', async (request, response, next) => {
 
 router.delete('/:id', async (request, response, next) => {
   try {
-    const deletedBlog = await Blog.findByIdAndDelete(request.params.id)
-    if (!deletedBlog) {
-      return response.status(404).json({ error: 'Blog not found' })
+    const token = request.token
+
+    if (!token) {
+      return response.status(401).json({ error: 'token missing' })
     }
 
-    if (deletedBlog.user) {
-      await User.findByIdAndUpdate(deletedBlog.user, {
-        $pull: { blogs: deletedBlog._id },
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+
+    const blog = await Blog.findById(request.params.id)
+    if (!blog) {
+      return response.status(404).json({ error: 'blog not found' })
+    }
+
+    if (blog.user.toString() !== decodedToken.id.toString()) {
+      return response.status(401).json({ error: 'unauthorized action' })
+    }
+
+    await Blog.findByIdAndDelete(request.params.id)
+
+    if (blog.user) {
+      await User.findByIdAndUpdate(blog.user, {
+        $pull: { blogs: blog._id },
       })
     }
 
