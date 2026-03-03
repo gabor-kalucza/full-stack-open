@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
+import Blogs from './components/Blogs'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -16,10 +17,10 @@ const App = () => {
 
     try {
       const user = await loginService.login({ username, password })
+      localStorage.setItem('user', JSON.stringify(user))
       setUser(user)
       setUsername('')
       setPassword('')
-      console.log(user)
     } catch {
       setErrorMessage('wrong credentials')
       setTimeout(() => {
@@ -30,6 +31,14 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
+  }, [])
+
+  useEffect(() => {
+    const loggedUserJSON = localStorage.getItem('user')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+    }
   }, [])
 
   return (
@@ -46,13 +55,10 @@ const App = () => {
           />
         </>
       )}
+
       {user && (
         <>
-          <h2>blogs</h2>
-          <p>{user.name}</p>
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}{' '}
+          <Blogs user={user} blogs={blogs} setUser={setUser} />
         </>
       )}
     </div>
