@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import BlogList from './components/BlogList'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -12,10 +13,20 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [notification, setNotification] = useState(null)
+  const blogFormRef = useRef()
+
+  const notify = (message, type = 'success') => {
+    setNotification({ text: message, type })
+    setTimeout(() => setNotification(null), 5000)
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('user')
     setUser(null)
+  }
+
+  const onSuccess = () => {
+    blogFormRef.current.toggleVisibility()
   }
 
   const handleLogin = async (event) => {
@@ -34,14 +45,7 @@ const App = () => {
           ? error.response.data.error
           : 'something went wrong'
 
-      setNotification({
-        text: errorMessage,
-        type: 'error',
-      })
-
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      notify(errorMessage, 'error')
     }
   }
 
@@ -83,10 +87,13 @@ const App = () => {
           <br />
           <h2>create new</h2>
           <Notification message={notification} />
-          <CreateBlogForm
-            setBlogs={setBlogs}
-            setNotification={setNotification}
-          />
+          <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+            <CreateBlogForm
+              setBlogs={setBlogs}
+              notify={notify}
+              onSuccess={onSuccess}
+            />
+          </Togglable>
           <br />
           <BlogList blogs={blogs} />
         </>
