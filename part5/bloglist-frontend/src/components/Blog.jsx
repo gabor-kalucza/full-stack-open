@@ -1,10 +1,33 @@
-import { useState } from 'react'
+import debounce from 'debounce'
+import { useMemo, useState } from 'react'
+import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, notify }) => {
   const [showDetails, setShowDetails] = useState(false)
+  const [likes, setLikes] = useState(blog.likes)
+
+  const debouncedNotify = useMemo(
+    () => debounce((msg, type) => notify(msg, type), 1000),
+    [notify],
+  )
 
   const toggleDetails = () => {
     setShowDetails(!showDetails)
+  }
+
+  const updateLikes = async (id) => {
+    try {
+      await blogService.update(id, {
+        ...blog,
+        likes: likes + 1,
+      })
+
+      setLikes((prevLikes) => prevLikes + 1)
+      debouncedNotify(`you liked ${blog.title} by ${blog.author}`)
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'something went wrong'
+      debouncedNotify(errorMessage, 'error')
+    }
   }
 
   const blogStyle = {
@@ -24,8 +47,14 @@ const Blog = ({ blog }) => {
       <div>
         {showDetails && (
           <>
-            <div>{blog.url}</div>
-            <div>likes {blog.likes}</div>
+            <a href={blog.url} target='_blank'>
+              {blog.url}
+            </a>
+            <div>
+              <span>likes {likes}</span>{' '}
+              <button onClick={() => updateLikes(blog.id)}>Like</button>
+            </div>
+
             <div>{blog.user && blog.user.name}</div>
           </>
         )}
