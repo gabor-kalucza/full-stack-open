@@ -2,7 +2,7 @@ import debounce from 'debounce'
 import { useMemo, useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, notify }) => {
+const Blog = ({ blog, notify, setBlogs }) => {
   const [showDetails, setShowDetails] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
@@ -24,6 +24,18 @@ const Blog = ({ blog, notify }) => {
 
       setLikes((prevLikes) => prevLikes + 1)
       debouncedNotify(`you liked ${blog.title} by ${blog.author}`)
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'something went wrong'
+      debouncedNotify(errorMessage, 'error')
+    }
+  }
+  const deleteBlog = async (id) => {
+    try {
+      if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+        await blogService.remove(id)
+        setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog.id !== id))
+        debouncedNotify(`${blog.title} successfully deleted`)
+      }
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'something went wrong'
       debouncedNotify(errorMessage, 'error')
@@ -56,6 +68,7 @@ const Blog = ({ blog, notify }) => {
             </div>
 
             <div>{blog.user && blog.user.name}</div>
+            <button onClick={() => deleteBlog(blog.id)}>Remove</button>
           </>
         )}
       </div>
