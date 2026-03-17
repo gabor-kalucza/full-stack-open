@@ -51,7 +51,7 @@ const Blog = ({ blog, notify, setBlogs }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <article style={blogStyle}>
       {blog.title} {blog.author}
       <button onClick={toggleDetails}>
         {showDetails ? 'Hide' : 'Show'} Details
@@ -72,7 +72,7 @@ const Blog = ({ blog, notify, setBlogs }) => {
           </>
         )}
       </div>
-    </div>
+    </article>
   )
 }
 
