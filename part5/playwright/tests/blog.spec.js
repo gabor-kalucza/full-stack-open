@@ -45,4 +45,44 @@ describe('Blog app', () => {
       ).toBeVisible()
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page, request }) => {
+      await request.post('http://localhost:3003/api/testing/reset')
+
+      await request.post('http://localhost:3003/api/users', {
+        data: {
+          name: 'Test User',
+          username: 'testuser',
+          password: 'secret',
+        },
+      })
+
+      await page.goto('http://localhost:5173')
+
+      await page.getByLabel('username').fill('testuser')
+      await page.getByLabel('password').fill('secret')
+      await page.getByRole('button', { name: 'login' }).click()
+
+      await expect(page.getByText('Test User logged in')).toBeVisible()
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'create new blog' }).click()
+
+      await page.getByLabel('title').fill('My First Blog')
+      await page.getByLabel('author').fill('John Doe')
+      await page.getByLabel('url').fill('http://example.com')
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await expect(
+        page.getByText('My First Blog by John Doe added'),
+      ).toBeVisible()
+
+      await expect(
+        page.locator('article', { hasText: 'My First Blog John Doe' }).first(),
+      ).toBeVisible()
+    })
+  })
 })
