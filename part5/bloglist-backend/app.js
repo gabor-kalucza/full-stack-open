@@ -5,6 +5,7 @@ const logger = require('./utils/logger')
 const express = require('express')
 const config = require('./utils/config')
 const mongoose = require('mongoose')
+const testingRouter = require('./controllers/testing')
 const {
   requestLogger,
   unknownEndpoint,
@@ -25,6 +26,10 @@ const connectToMongoDB = async () => {
 }
 
 connectToMongoDB()
+
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/testing', testingRouter)
+}
 
 app.use(express.static('dist'))
 app.use(express.json())
