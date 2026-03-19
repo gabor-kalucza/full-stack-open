@@ -110,4 +110,45 @@ describe('Blog app', () => {
       await expect(blog).toHaveCount(0)
     })
   })
+
+  test('blogs are ordered by likes, highest first', async ({
+    page,
+    request,
+  }) => {
+    const loginResponse = await request.post(`${apiUrl}/api/login`, {
+      data: { username: 'testuser', password: 'secret' },
+    })
+    const { token } = await loginResponse.json()
+
+    const blogs = [
+      { title: 'a', author: 'A', url: 'http://a.com', likes: 1 },
+      { title: 'b', author: 'B', url: 'http://b.com', likes: 5 },
+      { title: 'c', author: 'C', url: 'http://c.com', likes: 3 },
+    ]
+
+    for (const blog of blogs) {
+      await request.post(`${apiUrl}/api/blogs`, {
+        data: blog,
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    }
+
+    await page.reload()
+
+    const articles = page.locator('article')
+    const count = await articles.count()
+    const likesArray = []
+
+    for (let i = 0; i < count; i++) {
+      const article = articles.nth(i)
+      await article.getByRole('button', { name: /show details/i }).click()
+      const likesText = await article
+        .locator('span', { hasText: /^likes/i })
+        .textContent()
+      likesArray.push(parseInt(likesText.replace(/\D/g, ''), 10))
+    }
+
+    const sortedLikes = [...likesArray].sort((a, b) => b - a)
+    expect(likesArray).toEqual(sortedLikes)
+  })
 })

@@ -2,7 +2,7 @@ import debounce from 'debounce'
 import { useMemo, useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, notify, setBlogs }) => {
+const Blog = ({ blog, notify, setBlogs, user }) => {
   const [showDetails, setShowDetails] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
@@ -42,6 +42,8 @@ const Blog = ({ blog, notify, setBlogs }) => {
     }
   }
 
+  const canDelete = user && blog.user && user.username === blog.user.username
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -68,7 +70,9 @@ const Blog = ({ blog, notify, setBlogs }) => {
             </div>
 
             <div>{blog.user && blog.user.name}</div>
-            <button onClick={() => deleteBlog(blog.id)}>Remove</button>
+            {canDelete && (
+              <button onClick={() => deleteBlog(blog.id)}>Remove</button>
+            )}
           </>
         )}
       </div>
