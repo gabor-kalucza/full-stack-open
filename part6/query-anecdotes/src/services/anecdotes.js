@@ -8,7 +8,6 @@ const getAll = async () => {
 
   return response.json()
 }
-
 const createNew = async (anecdote) => {
   const config = {
     method: 'POST',
@@ -19,11 +18,13 @@ const createNew = async (anecdote) => {
   }
 
   const response = await fetch(BASE_URL, config)
+  const data = await response.json()
+
   if (!response.ok) {
-    throw new Error('something went wrong')
+    throw new Error(data.error || 'something went wrong')
   }
 
-  return response.json()
+  return data
 }
 
 const update = async (anecdote) => {
